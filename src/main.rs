@@ -19,7 +19,8 @@ struct Stats {
     total_op_return: usize,
     txid: String,
     opreturn_ascii: String,
-    opreturn_hex: String
+    opreturn_hex: String,
+    total_transactions: usize
 }
 
 #[tokio::main]
@@ -79,10 +80,9 @@ async fn main() -> Result<(), reqwest::Error> {
         start_index += 25;
     }
 
-    println!("Found {} transactions in block.", all_transactions.len());
-
     let mut txnumber = 0;
     let mut stats = Stats::default();
+    stats.total_transactions = all_transactions.len();
     // 4. Check each transaction for OP_RETURN
     for tx in all_transactions {
         txnumber += 1;
@@ -113,13 +113,14 @@ async fn main() -> Result<(), reqwest::Error> {
         }
     }
     println!("--------------------------------------------------");
-    println!("Statistics for block number: {}", target_height);
+    println!("Statistics for block number:      {}", target_height);
+    println!("  Total transactions processed:   {}", stats.total_transactions);
+    println!("  Total OP_RETURN occurrences:    {}", stats.total_op_return);
     println!("  Smallest OP_RETURN data length: {} characters", stats.smallest_op_return);
     println!("  Largest OP_RETURN data length:  {} characters", stats.largest_op_return);
-    println!("    (Transaction ID: {})", stats.txid);
+    println!("    (Transaction ID:         {})", stats.txid);
     println!("    (OP_RETURN Data - ASCII: {})", stats.opreturn_ascii);
-    println!("    (OP_RETURN Data - HEX: {})", stats.opreturn_hex);
-    println!("  Total OP_RETURN occurrences:     {}", stats.total_op_return);
+    println!("    (OP_RETURN Data - HEX:   {})", stats.opreturn_hex);
     Ok(())
 }
 
