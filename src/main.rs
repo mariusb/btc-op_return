@@ -16,6 +16,8 @@ struct TxOut {
 struct Stats {
     smallest_op_return: usize,
     largest_op_return: usize,
+    smallest_op_return_hex: usize,
+    largest_op_return_hex: usize,
     total_op_return: usize,
     txid: String,
     opreturn_ascii: String,
@@ -102,9 +104,11 @@ async fn main() -> Result<(), reqwest::Error> {
                 let data_length  = ascii_data.len(); // Each byte is represented by two hex characters
                 if stats.smallest_op_return == 0 || data_length < stats.smallest_op_return {
                     stats.smallest_op_return = data_length;
+                    stats.smallest_op_return_hex = hex_data.len();
                 }
                 if data_length > stats.largest_op_return {
                     stats.largest_op_return = data_length;
+                    stats.largest_op_return_hex = hex_data.len();
                     stats.txid = tx.txid.clone();
                     stats.opreturn_ascii = ascii_data.clone();
                     stats.opreturn_hex = hex_data.clone();
@@ -116,6 +120,8 @@ async fn main() -> Result<(), reqwest::Error> {
     println!("Statistics for block number:      {}", target_height);
     println!("  Total transactions processed:   {}", stats.total_transactions);
     println!("  Total OP_RETURN occurrences:    {}", stats.total_op_return);
+    println!("  Smallest OP_RETURN hex length:  {} ({})", stats.smallest_op_return_hex, stats.smallest_op_return_hex/2);
+    println!("  Largest OP_RETURN hex length:   {} ({})", stats.largest_op_return_hex, stats.largest_op_return_hex/2);
     println!("  Smallest OP_RETURN data length: {} characters", stats.smallest_op_return);
     println!("  Largest OP_RETURN data length:  {} characters", stats.largest_op_return);
     println!("    (Transaction ID:         {})", stats.txid);
